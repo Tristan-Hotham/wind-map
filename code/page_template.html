@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Where the Wind Blows</title>
+<meta name="description" content="A month by month map of the world's winds: the trade winds, the westerlies, the Roaring Forties and the monsoon, the windiest places on land, and whether wind farms sit where the wind is.">
+<meta property="og:title" content="Where the wind blows: the world's winds, and are wind farms in the windy places?">
+<meta property="og:description" content="{{farms.share_cap_above_median|pct}} of onshore wind farm capacity sits on ground windier than its country's median. Explore the world's winds month by month.">
+<meta property="og:image" content="https://maps.tristanhotham.com/wind-map/header.png">
+<meta property="og:url" content="https://maps.tristanhotham.com/wind-map/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Weathered chart paper, sea ink and a wind palette: sage, teal, deep blue, plum, coral. */
+:root{
+  --bg:#F4F2EC; --panel:#EAE7DE; --fg:#16202A; --muted:#5B6470; --rule:#D9D4C8; --card:#FBFAF6; --border:#C9C3B6;
+  --deep:#24356B; --teal:#1F7A8C; --plum:#7A2E74; --coral:#D9583B; --gold:#D99A1E; --sea:#DCE4E8;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161D; --panel:#1A212B; --fg:#E9EDF1; --muted:#A1AAB5; --rule:#2B3440; --card:#171E27; --border:#3B4654;
+  --deep:#9DB2F2; --teal:#5CC3D3; --plum:#D58ACB; --coral:#F08A6C; --gold:#F0BE52; --sea:#18202A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161D; --panel:#1A212B; --fg:#E9EDF1; --muted:#A1AAB5; --rule:#2B3440; --card:#171E27; --border:#3B4654;
+  --deep:#9DB2F2; --teal:#5CC3D3; --plum:#D58ACB; --coral:#F08A6C; --gold:#F0BE52; --sea:#18202A; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 18px/1.62 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+.wrap{max-width:680px;margin:0 auto;padding-block:28px 64px}
+.wrap .bleed{width:min(1120px,calc(100vw - 32px));margin-left:calc((100% - min(1120px,100vw - 32px))/2);margin-right:0}
+a{color:inherit;text-decoration-color:var(--teal);text-underline-offset:3px}
+.kicker{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.kicker b{background:var(--deep);color:#fff;padding:5px 8px;font-weight:500}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kicker b{color:#11161D}}
+:root[data-theme="dark"] .kicker b{color:#11161D}
+header.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:end;border-bottom:6px double var(--fg);padding-bottom:22px;margin-top:18px}
+h1{font:900 clamp(46px,11.5vw,98px)/.9 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .d{color:var(--deep)} h1 .s{color:var(--teal)}
+.mark{width:clamp(78px,17vw,132px);height:auto;display:block}
+.dek{grid-column:1/-1;font-size:21px;line-height:1.42;margin:8px 0 0;max-width:50ch}
+.byline{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:14px}
+h2{font:800 34px/1.04 var(--display);letter-spacing:-.01em;margin:52px 0 10px;text-wrap:balance}
+h2 .n{font:500 13px/1 var(--mono);color:var(--teal);display:block;letter-spacing:.1em;margin-bottom:10px}
+h3{font:600 20px/1.25 var(--display);margin:28px 0 6px}
+p{margin:0 0 16px}
+.lede::first-letter{font:900 72px/.8 var(--display);float:left;margin:6px 10px 0 0;color:var(--deep)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:26px 0 8px}
+.stats div{background:var(--card);padding:14px 12px}
+.stats b{display:block;font:900 clamp(26px,5.6vw,38px)/1 var(--display);color:var(--fg)}
+.stats b.t{color:var(--teal)} .stats b.d{color:var(--deep)} .stats b.c{color:var(--coral)} .stats b.p{color:var(--plum)}
+.stats span{font:400 12px/1.35 var(--mono);color:var(--muted);display:block;margin-top:6px}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.figure{margin:26px 0 30px}
+.fig-h{font:600 19px/1.25 var(--display);margin:0 0 4px}
+.fig-sub{font:400 13px/1.45 var(--mono);color:var(--muted);margin:0 0 12px}
+.src{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:10px}
+.chart{width:100%;position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--mono);fill:var(--fg)}
+.lab{font-size:12px}.lab.m{fill:var(--muted)}.lab.b{font-weight:500}.lab.s{font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font:400 12px/1.45 var(--mono);padding:8px 10px;border-radius:3px;max-width:280px;z-index:1000;transform:translate(-50%,calc(-100% - 12px));display:none}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
+@media (max-width:600px){.controls.scroll{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:thin}.controls.scroll>*{flex:0 0 auto}}
+.btn{font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;cursor:pointer;min-height:36px;white-space:nowrap}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;max-width:100%}
+.seg .btn{border:0;border-radius:0;border-right:1px solid var(--border)}
+.seg .btn:last-child{border-right:0}
+.searchbox{position:relative;flex:1 1 240px;min-width:0}
+input[type=search]{font:400 15px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 11px;min-height:40px;width:100%}
+.suggest{position:absolute;left:0;right:0;top:100%;margin:2px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--border);z-index:1001;font:400 13px/1.3 var(--mono);display:none;max-height:300px;overflow:auto}
+.suggest li{padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--rule)}
+.suggest li span{color:var(--muted)}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--panel)}
+.monthbar{display:flex;gap:10px;align-items:center;margin:0 0 10px;font:500 12px/1 var(--mono)}
+.monthbar input[type=range]{flex:1 1 auto;accent-color:var(--teal);min-width:0;height:28px}
+.monthbar output{min-width:94px;font:800 18px/1 var(--display)}
+.ticks{display:grid;grid-template-columns:repeat(13,1fr);font:400 10px/1 var(--mono);color:var(--muted);margin:-6px 0 10px 104px;padding-right:92px}
+.ticks span{text-align:center}
+@media (max-width:600px){.ticks{display:none}}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+@media (max-width:900px){.mapgrid{grid-template-columns:1fr}}
+#lmap{height:720px;border:1px solid var(--border);background:#DCE4E8;border-radius:2px}
+@media (max-width:900px){#lmap{height:560px}}
+@media (max-width:600px){#lmap{height:440px}}
+.leaflet-container{font:400 12px/1.4 var(--mono)}
+.leaflet-bar a,.leaflet-bar a:hover{background:var(--card);color:var(--fg);border-bottom-color:var(--border)}
+@media (max-width:600px){.leaflet-control-attribution{font-size:10px;line-height:1.25}}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--card) 85%,transparent)!important;color:var(--muted)}
+.leaflet-control-attribution a{color:var(--fg)}
+.leaflet-popup-content{font:400 12.5px/1.5 var(--mono);margin:12px 14px}
+.leaflet-popup-content b.h{font:700 15px/1.2 var(--display);display:block;margin-bottom:4px}
+.city{font:500 11px/1 var(--mono);color:#16202A;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff;pointer-events:none}
+.city.dk{color:#F2F4F6;text-shadow:0 0 3px #000,0 0 3px #000,0 0 2px #000}
+.city.s{font-size:10px;font-weight:400}
+.city i{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:4px;vertical-align:1px}
+.lyrBtn{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;font:600 12px/1 var(--mono);padding:8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.lyrBtn[aria-expanded="true"]{background:var(--fg);color:var(--bg)}
+.lyrPanel{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 12px 8px;margin-top:6px;width:244px;box-shadow:0 2px 10px rgba(0,0,0,.2);font:400 12px/1.3 var(--mono);max-height:70vh;overflow:auto}
+.lyrPanel[hidden]{display:none}
+.lyrPanel .row{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center;margin:0 0 9px}
+.lyrPanel label{display:flex;gap:6px;align-items:center;cursor:pointer;font-weight:600}
+.lyrPanel input[type=range]{width:100%;accent-color:var(--fg)}
+.lyrPanel select{font:400 12px var(--mono);background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:2px;padding:2px 4px;width:100%}
+.lyrPanel .sub{grid-column:1/-1;display:flex;gap:6px;align-items:center;color:var(--muted);font-size:11px}
+.lyrPanel .sub span{flex:0 0 52px}
+.lyrPanel .reset{font:400 11px var(--mono);color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+@media (max-width:600px){.lyrPanel{width:214px}}
+.pin{width:18px;height:18px;border:3px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 2px #16202A}
+.side{background:var(--card);border:1px solid var(--border);padding:14px 14px 10px}
+.side h4{font:500 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+#legend svg{width:100%;height:auto;display:block}
+#readout{font:400 12.5px/1.5 var(--mono);border-top:1px solid var(--rule);padding-top:10px;margin-top:10px;min-height:120px}
+#readout b{font-weight:500}
+#readout .big{font:800 22px/1.15 var(--display);margin:2px 0 6px;display:block}
+#readout svg{width:100%;height:auto;display:block;margin:6px 0}
+.sw{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin-right:6px;border:1px solid var(--border)}
+.pull{font:600 26px/1.25 var(--display);border-left:6px solid var(--teal);padding:4px 0 4px 18px;margin:30px 0}
+.note{background:var(--panel);border:1px solid var(--rule);padding:14px 16px;font-size:16px;margin:22px 0}
+.note h3{margin-top:0}
+table.t{width:100%;border-collapse:collapse;font:400 13px/1.35 var(--mono)}
+table.t th{text-align:left;font-weight:500;color:var(--muted);border-bottom:2px solid var(--fg);padding:6px 8px 6px 0;cursor:pointer;white-space:nowrap}
+table.t td{border-bottom:1px solid var(--rule);padding:7px 8px 7px 0;vertical-align:top}
+table.t td.num,table.t th.num{text-align:right;white-space:nowrap}
+table.t td small{color:var(--muted);display:block}
+table.t tr.go{cursor:pointer}
+table.t tr.go:hover td{background:var(--panel)}
+.tablewrap{overflow-x:auto;max-height:520px;overflow-y:auto;border-bottom:1px solid var(--rule)}
+@media (max-width:600px){table.t .wide{display:none}}
+details{margin:14px 0}
+summary{font:500 13px/1.4 var(--mono);cursor:pointer;color:var(--fg);padding:8px 0}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.cta a{font:500 13px/1 var(--mono);text-decoration:none;border:1px solid var(--fg);padding:11px 14px;border-radius:3px}
+.cta a.p{background:var(--deep);border-color:var(--deep);color:#fff}
+footer{border-top:6px double var(--fg);margin-top:56px;padding-top:16px;font:400 13px/1.55 var(--mono);color:var(--muted)}
+footer p{margin:0 0 10px}
+.theme{position:fixed;right:12px;bottom:12px;z-index:1002}
+.loading{font:400 12px/1.4 var(--mono);color:var(--muted)}
+.flowcv{position:absolute;inset:0;z-index:450;pointer-events:none}
+@media print{.theme,.controls{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="kicker"><b>Data study</b><span>Wind</span><span>World, UK and Ireland</span></div>
+<header class="hero">
+  <h1><span class="d">Where the</span> <span class="s">wind blows</span></h1>
+  <svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><g id="heroMark"></g></svg>
+  <p class="dek">A month by month map of the world's winds: the trade winds, the westerlies, the Roaring Forties and the monsoon that turns around each year. Where are the windiest places on land, how much does the wind change with the seasons, and do the world's wind farms actually sit where the wind is?</p>
+</header>
+<div class="byline">Dr Tristan Hotham · Independent researcher · 2026 · Data: WorldClim 2.1 (Fick and Hijmans 2017); NCEP/NCAR Reanalysis 1 (NOAA PSL, public domain); WRI Global Power Plant Database v1.3 (CC BY 4.0)</div>
+
+<div class="stats">
+  <div><b class="c">{{farms.share_cap_above_median|pct}}</b><span>of onshore wind farm capacity sits on ground windier than its country's median</span></div>
+  <div><b class="d">{{circ.roar_s|f1}} m/s</b><span>mean wind over the Roaring Forties, 40 to 50° S, against {{circ.roar_n|f1}} at 40 to 50° N</span></div>
+  <div><b class="t">{{uk.mean|f1}} m/s</b><span>the UK's mean wind over land, {{derived.uk_vs_land|f1}} times the world's land average</span></div>
+  <div><b class="p">{{land.nh_windiest_month|raw}}</b><span>is the windiest month on northern land. In the south it is {{land.sh_windiest_month|raw}}</span></div>
+</div>
+
+/*INTRO*/
+
+<h2><span class="n">01 · The map</span>Watch the wind through the year</h2>
+<div class="figure bleed">
+  <div class="controls scroll">
+    <div class="seg" role="group" aria-label="Map layer" id="modeBtns"><button class="btn" data-m="speed" aria-pressed="true">Wind speed</button><button class="btn" data-m="seas" aria-pressed="false">Seasonality</button><button class="btn" data-m="peak" aria-pressed="false">Windiest month</button></div>
+    <button class="btn" id="farmBtn" aria-pressed="false">Wind farms</button>
+    <div class="seg" role="group" aria-label="View" id="viewBtns"><button class="btn" data-v="world">World</button><button class="btn" data-v="uk">UK and Ireland</button><button class="btn" data-v="monsoon">Monsoon</button></div>
+  </div>
+  <div class="monthbar">
+    <button class="btn" id="play" aria-label="Play the months">▶ Play</button>
+    <input type="range" id="month" min="0" max="12" step="1" value="0" aria-label="Month: 0 is the whole year, 1 to 12 are January to December">
+    <output id="monthOut" for="month">Whole year</output>
+  </div>
+  <div class="ticks" aria-hidden="true"><span>Year</span><span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span></div>
+  <div class="controls">
+    <div class="searchbox">
+      <input type="search" id="q" placeholder="Search a place or country" aria-label="Find a place or country" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sug">
+      <ul class="suggest" id="sug" role="listbox"></ul>
+    </div>
+    <button class="btn" id="geo">Use my location</button>
+    <span class="loading" id="loadMsg"></span>
+  </div>
+  <div class="mapgrid">
+    <div id="lmap" role="region" aria-label="Map of mean wind speed"></div>
+    <div class="side">
+      <h4 id="legTitle">Mean wind speed at 10 m</h4>
+      <div id="legend"></div>
+      <div id="readout">Click the map or search a place to read its wind.</div>
+    </div>
+  </div>
+  <div class="src">Land: WorldClim 2.1 mean wind speed at 10 m above the ground, 1970 to 2000, drawn from cells of 5 arc minutes (about 9 km) as coloured classes; values on click come from a 0.5° summary rounded to 0.5 m/s, as WorldClim's grids may not be redistributed. Sea, and the moving lines: NCEP/NCAR Reanalysis 1 near-surface wind (sigma level 0.995, roughly the lowest 40 m), 1991 to 2020, 2.5° cells, drawn fainter because it is coarser and measured higher up. Wind farms: WRI Global Power Plant Database, a 2021 snapshot. Base map and hill shading tiles © Esri.</div>
+</div>
+
+/*BODY*/
+
+<div class="cta">
+  <a class="p" href="https://github.com/Tristan-Hotham/wind-map">Data and code</a>
+  <a href="{{DOI_URL}}">Paper (Zenodo)</a>
+  <a href="https://blog.tristanhotham.com/2026/10/31/wind-map/">Blog post</a>
+  <a href="https://blog.tristanhotham.com/">All posts</a>
+</div>
+<footer>
+  <p>Dr Tristan Hotham, Independent researcher. ORCID 0000-0003-4931-9349. Cite as: Hotham, T. (2026) Where the wind blows: the world's winds month by month, its windiest places, and whether wind farms sit in them. https://doi.org/{{DOI}}</p>
+  <p>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</p>
+  <p>Land wind: Fick, S.E. and Hijmans, R.J. (2017) WorldClim 2: new 1 km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37: 4302 to 4315. WorldClim data are free for research and other non-commercial use with this citation; this page shows pictures and coarse summaries derived from them, not the grids themselves. Circulation and ocean wind: NCEP/NCAR Reanalysis 1 long-term monthly means, 1991 to 2020, NOAA Physical Sciences Laboratory, Boulder, Colorado (public domain); Kalnay, E. et al. (1996) The NCEP/NCAR 40-year reanalysis project. Bulletin of the American Meteorological Society 77: 437 to 471. Wind farms: Global Energy Observatory, Google, KTH Royal Institute of Technology in Stockholm, Enipedia and World Resources Institute (2021) Global Power Plant Database v1.3.0 (CC BY 4.0). Boundaries and places: Natural Earth (public domain); UK counties from Office for National Statistics boundaries (Open Government Licence v3). Base map and hill shading tiles © Esri. Map library: Leaflet.</p>
+  <p>Text, figures and derived data: CC BY 4.0, except that the WorldClim-derived pictures and summaries are for non-commercial use, as the WorldClim terms require; the WorldClim grids are not redistributed. Code: MIT. Other studies: <a href="https://maps.tristanhotham.com/dark-skies/">Darkest skies</a>, <a href="https://maps.tristanhotham.com/sun-and-rain/">Sun and rain</a>, <a href="https://blog.tristanhotham.com/">all posts</a>.</p>
+</footer>
+</div>
+<div class="tip" id="tip"></div>
+<button class="btn theme" id="theme" aria-label="Toggle dark mode">◐</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const PD = /*PD*/;
+const NS = "http://www.w3.org/2000/svg";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const el = (t, a = {}, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const fmt = n => n == null || isNaN(n) ? "n/a" : Math.round(n).toLocaleString("en-GB");
+const f1 = x => x == null || isNaN(x) ? "n/a" : (+x).toFixed(1);
+const pc = (x, d = 0) => x == null ? "n/a" : (x * 100).toFixed(d) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const tip = document.getElementById("tip");
+function showTip(h, x, y) { tip.innerHTML = h; tip.style.display = "block"; const w = tip.offsetWidth; x = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x)); tip.style.left = x + scrollX + "px"; tip.style.top = y + scrollY + "px"; }
+function hideTip() { tip.style.display = "none"; }
+function hover(node, h) { node.style.cursor = "pointer"; node.setAttribute("tabindex", "0"); const s = () => { const r = node.getBoundingClientRect(); showTip(h, r.left + r.width / 2, r.top); }; node.addEventListener("pointerenter", s); node.addEventListener("pointerleave", hideTip); node.addEventListener("focus", s); node.addEventListener("blur", hideTip); }
+const redraws = [];
+function resp(box, render) { let last = 0; const go = (force) => { const w = Math.max(280, Math.round(box.clientWidth)); if (!force && Math.abs(w - last) < 4) return; last = w; box.innerHTML = ""; render(w, w < 560); }; new ResizeObserver(() => go()).observe(box); go(); redraws.push(() => go(true)); }
+const lbl = (svg, x, y, s, cls = "lab", anchor = "start") => { const t = el("text", { x, y, class: cls, "text-anchor": anchor }, svg); t.textContent = s; return t; };
+const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ===== colour scales ===== */
+const WSTOPS = [[0, [246, 243, 233]], [1, [232, 236, 212]], [2, [199, 224, 194]], [3, [141, 202, 183]], [4, [77, 169, 173]], [5, [40, 129, 165]], [6, [37, 92, 150]],
+  [7, [44, 61, 125]], [8.5, [76, 41, 119]], [10, [128, 37, 112]], [12.5, [182, 53, 92]], [16, [226, 104, 72]]];
+function windRGB(s) {
+  if (s <= 0) return WSTOPS[0][1]; if (s >= 16) return WSTOPS[WSTOPS.length - 1][1];
+  for (let i = 1; i < WSTOPS.length; i++) if (s <= WSTOPS[i][0]) { const a = WSTOPS[i - 1], b = WSTOPS[i], t = (s - a[0]) / (b[0] - a[0]); return a[1].map((x, k) => Math.round(x + (b[1][k] - x) * t)); }
+}
+const SSTOPS = [[1, [238, 238, 230]], [1.25, [238, 224, 178]], [1.6, [232, 186, 96]], [2.1, [216, 124, 52]], [3, [168, 58, 48]], [4.5, [92, 28, 62]]];
+function seasRGB(r) {
+  if (r <= 1) return SSTOPS[0][1]; if (r >= 4.5) return SSTOPS[SSTOPS.length - 1][1];
+  for (let i = 1; i < SSTOPS.length; i++) if (r <= SSTOPS[i][0]) { const a = SSTOPS[i - 1], b = SSTOPS[i], t = (r - a[0]) / (b[0] - a[0]); return a[1].map((x, k) => Math.round(x + (b[1][k] - x) * t)); }
+}
+// windiest month: a colour wheel, winter blues, spring greens, summer golds, autumn reds
+const MCOL = [[47, 84, 150], [62, 120, 178], [70, 160, 150], [96, 170, 92], [160, 190, 70], [228, 196, 64], [236, 150, 50], [214, 98, 52], [176, 60, 72], [128, 52, 110], [88, 60, 140], [56, 66, 140]];
+const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+/* hero mark: three streamlines and a turbine */
+(() => { const g = document.getElementById("heroMark"); el("rect", { x: 0, y: 0, width: 120, height: 120, rx: 6, fill: "#DCE4E8" }, g);
+  const cols = ["#1F7A8C", "#24356B", "#7A2E74"];
+  const paths = [];
+  [28, 52, 76].forEach((y, k) => paths.push(el("path", { d: `M-10 ${y} C 20 ${y - 16}, 40 ${y + 16}, 70 ${y} S 110 ${y - 14}, 140 ${y}`, fill: "none", stroke: cols[k], "stroke-width": 4, "stroke-linecap": "round", "stroke-dasharray": "34 14" }, g)));
+  el("line", { x1: 88, y1: 116, x2: 88, y2: 74, stroke: "#16202A", "stroke-width": 3 }, g);
+  const rot = el("g", { transform: "translate(88 72)" }, g);
+  [0, 120, 240].forEach(a => el("path", { d: "M0 0 L-3 -4 L0 -26 L3 -4 Z", fill: "#16202A", transform: `rotate(${a})` }, rot));
+  el("circle", { cx: 0, cy: 0, r: 3, fill: "#D9583B" }, rot);
+  if (reduced) return;
+  let t = 0; (function f() { t += 1; rot.setAttribute("transform", `translate(88 72) rotate(${t * 3})`); paths.forEach((p, k) => p.setAttribute("stroke-dashoffset", -(t * (1.2 + k * .3)) % 48)); requestAnimationFrame(f); })();
+})();
+
+/* ===== grids ===== */
+const WG = { w: 4320, h: 1728, top: 84, cell: 1 / 12 };
+const D = { year: null, m: [], seas: null, peak: null, sum: null, u: null, v: null, s: null };
+const msg = document.getElementById("loadMsg");
+async function pixels(url, w, h) {
+  const blob = await (await fetch(url)).blob();
+  let src; try { src = await createImageBitmap(blob, { colorSpaceConversion: "none", premultiplyAlpha: "none" }); }
+  catch (e) { src = await new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = URL.createObjectURL(blob); }); }
+  const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d", { willReadFrequently: true });
+  x.drawImage(src, 0, 0); return x.getImageData(0, 0, w, h).data;
+}
+const chan = (px, ch, n) => { const o = new Uint8Array(n); for (let i = 0; i < n; i++) o[i] = px[i * 4 + ch]; return o; };
+const N = WG.w * WG.h;
+/* WorldClim is shown as pictures only: palette images whose colours are classes. Each is kept as a class index and its colours. */
+function indexed(px) {
+  const idx = new Uint8Array(N), pal = [null], key = new Map();
+  for (let i = 0; i < N; i++) { const q = i * 4; if (px[q + 3] < 128) continue; const k = (px[q] << 16) | (px[q + 1] << 8) | px[q + 2]; let j = key.get(k); if (j === undefined) { j = pal.length; key.set(k, j); pal.push([px[q], px[q + 1], px[q + 2]]); } idx[i] = j; }
+  return { idx, pal };
+}
+const visP = {};
+function loadVis(name) { if (!visP[name]) visP[name] = pixels(`data/page/vis_${name}.png`, WG.w, WG.h).then(indexed); return visP[name]; }
+// readout values: 0.5 degree summary, 720 x 288 from 84N, rounded to 0.5 m/s; layer 0 = year, 1..12 = months
+const SG = { w: 720, h: 288, top: 84, cell: .5 };
+async function loadBase() {
+  msg.textContent = "Loading the wind maps...";
+  const [y, n, ...sm] = await Promise.all([loadVis("year"), pixels("data/page/ncep.png", 144, 73 * 13), ...[1, 2, 3, 4, 5].map(k => pixels(`data/page/sum_${k}.png`, SG.w, SG.h))]);
+  D.year = y; const ns = SG.w * SG.h; D.sum = [];
+  sm.forEach(px => { for (let j = 0; j < 3; j++) D.sum.push(chan(px, j, ns)); }); D.sum.length = 13;
+  const nn = 144 * 73 * 13; D.u = new Float32Array(nn); D.v = new Float32Array(nn); D.s = new Float32Array(nn);
+  for (let i = 0; i < nn; i++) { D.u[i] = (n[i * 4] - 128) / 5; D.v[i] = (n[i * 4 + 1] - 128) / 5; D.s[i] = n[i * 4 + 2] / 10; }
+  msg.textContent = "";
+}
+async function loadMonth(m) { if (!D.m[m - 1]) { msg.textContent = "Loading " + MON[m - 1] + "..."; D.m[m - 1] = await loadVis("m" + String(m).padStart(2, "0")); msg.textContent = ""; } }
+function loadMonths() { return Promise.all(Array.from({ length: 12 }, (_, k) => loadMonth(k + 1))); }
+async function loadModeImg(mode) { if (mode === "seas" && !D.seas) D.seas = await loadVis("seas"); if (mode === "peak" && !D.peak) D.peak = await loadVis("peak"); }
+const wIdx = (lat, lon) => { const r = Math.floor((WG.top - lat) / WG.cell), c = Math.floor((((lon + 180) % 360 + 360) % 360) / WG.cell); return r < 0 || r >= WG.h ? -1 : r * WG.w + c; };
+const sIdx = (lat, lon) => { const r = Math.floor((SG.top - lat) / SG.cell), c = Math.floor((((lon + 180) % 360 + 360) % 360) / SG.cell); return r < 0 || r >= SG.h ? -1 : r * SG.w + c; };
+const sumVal = (k, i) => i < 0 || !D.sum[k][i] ? null : (D.sum[k][i] - 1) / 2;
+// NCEP: bilinear on the 2.5 degree grid. month index 0..11, 12 = annual
+function ncep(arr, lat, lon, m) {
+  const fy = (90 - lat) / 2.5, fx = (((lon % 360) + 360) % 360) / 2.5, y0 = Math.max(0, Math.min(71, Math.floor(fy))), x0 = Math.floor(fx) % 144, x1 = (x0 + 1) % 144, ty = Math.min(1, Math.max(0, fy - y0)), tx = fx - Math.floor(fx), o = m * 73 * 144;
+  const g = (y, x) => arr[o + y * 144 + x];
+  return (g(y0, x0) * (1 - tx) + g(y0, x1) * tx) * (1 - ty) + (g(y0 + 1, x0) * (1 - tx) + g(y0 + 1, x1) * tx) * ty;
+}
+const nm = () => S.month === 0 ? 12 : S.month - 1;
+
+/* ===== map ===== */
+const S = { mode: "speed", month: 0, farms: false, sel: null };
+const map = L.map("lmap", { minZoom: 1, maxZoom: 11, zoomSnap: .5, worldCopyJump: true, maxBounds: [[-80, -260], [86, 260]], scrollWheelZoom: false }).setView([25, 10], 2);
+map.on("click", () => map.scrollWheelZoom.enable());
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const LY = { base: "light", hills: false, hillK: 45, names: true, nameLvl: 1, lines: true, lineK: 45, colour: 85, sea: true, flow: reduced ? "arrows" : "lines" };
+const LYDEF = { ...LY };
+try { Object.assign(LY, JSON.parse(localStorage.getItem("wm_layers") || "{}")); } catch (e) {}
+const saveLY = () => { try { localStorage.setItem("wm_layers", JSON.stringify(LY)); } catch (e) {} };
+map.createPane("wind"); map.getPane("wind").style.zIndex = 400; map.getPane("wind").style.pointerEvents = "none";
+map.createPane("hills"); map.getPane("hills").style.zIndex = 420; map.getPane("hills").style.pointerEvents = "none";
+map.createPane("lines"); map.getPane("lines").style.zIndex = 430; map.getPane("lines").style.pointerEvents = "none";
+map.createPane("farms"); map.getPane("farms").style.zIndex = 620;
+let base = null, hills = null, linesL = L.layerGroup(), nameL = L.layerGroup(), BORD = null;
+function setTiles() {
+  if (base) map.removeLayer(base); if (hills) map.removeLayer(hills);
+  base = LY.base === "none" ? null : L.tileLayer(LY.base === "sat" ? ESRI + "World_Imagery/MapServer/tile/{z}/{y}/{x}" : `${ESRI}Canvas/World_${LY.base === "dark" ? "Dark" : "Light"}_Gray_Base/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 16, attribution: "Tiles © Esri" });
+  if (base) base.addTo(map);
+  document.getElementById("lmap").style.background = LY.base === "dark" ? "#1B2026" : "#DCE4E8";
+  hills = L.tileLayer(ESRI + "Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, pane: "hills", attribution: "Hill shading © Esri" });
+  applyLayers();
+}
+function applyLayers() {
+  if (windL) { windL.setOpacity(LY.colour / 100); windL.redraw(); }
+  if (LY.hills) { hills.addTo(map); hills.setOpacity(.12 + LY.hillK / 100 * .6); } else map.removeLayer(hills);
+  drawLines(); placeNames(); flowReset();
+}
+const darkLines = () => LY.base === "dark" || LY.base === "sat";
+function drawLines() {
+  linesL.clearLayers(); if (!LY.lines || !BORD) { map.removeLayer(linesL); return; }
+  const col = darkLines() ? "#E9EDF1" : "#2A3340", op = .2 + LY.lineK / 100 * .75;
+  L.geoJSON({ type: "FeatureCollection", features: BORD.countries }, { pane: "lines", interactive: false, style: { color: col, weight: 1, opacity: op, fill: false } }).addTo(linesL);
+  if (map.getZoom() >= 5) L.geoJSON({ type: "FeatureCollection", features: BORD.uk }, { pane: "lines", interactive: false, style: { color: col, weight: .8, opacity: op * .8, dashArray: "3 3", fill: false } }).addTo(linesL);
+  linesL.addTo(map);
+}
+let PLACES = null, CTRY = null;
+function placeNames() {
+  nameL.clearLayers(); if (!LY.names || !PLACES) { map.removeLayer(nameL); return; }
+  const z = map.getZoom(), bb = map.getBounds().pad(.05), lvl = LY.nameLvl, dk = darkLines();
+  const minPop = [[2, 1e7], [3, 4e6], [4, 1.5e6], [5, 6e5], [6, 2.5e5], [7, 9e4], [8, 3e4], [99, 5000]].find(([zz]) => z < zz + (lvl === 2 ? 1 : lvl === 0 ? -1 : 0))[1] * (lvl === 0 ? 2 : 1);
+  const boxes = []; let n = 0;
+  for (const c of PLACES) {
+    if (c[3] < minPop) break; if (!bb.contains([c[1], c[2]])) continue;
+    const big = c[3] >= 1e6, pt = map.latLngToContainerPoint([c[1], c[2]]); const bx = [pt.x - 4, pt.y - 8, pt.x + 10 + c[0].length * (big ? 6.9 : 6.3), pt.y + 7];
+    if (boxes.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue;
+    boxes.push(bx); L.marker([c[1], c[2]], { interactive: false, keyboard: false, icon: L.divIcon({ className: "city" + (big ? "" : " s") + (dk ? " dk" : ""), html: `<i></i>${esc(c[0])}`, iconSize: null, iconAnchor: [3, 6] }) }).addTo(nameL);
+    if (++n >= 200) break;
+  }
+  nameL.addTo(map);
+}
+map.on("zoomend moveend", () => placeNames());
+map.on("zoomend", drawLines);
+(function layerControl() {
+  const Ctl = L.Control.extend({ options: { position: "topright" }, onAdd() {
+    const d = L.DomUtil.create("div"); L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+    d.innerHTML = `<button class="lyrBtn" aria-expanded="false" aria-controls="lyrPanel">Map layers</button>
+<div class="lyrPanel" id="lyrPanel" hidden>
+ <div class="row"><label for="lyBase" style="font-weight:600">Base map</label><div class="sub"><select id="lyBase" aria-label="Base map"><option value="light">Light grey</option><option value="dark">Dark grey</option><option value="sat">Satellite</option><option value="none">None</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyHills"> Hills</label><div class="sub"><span>strength</span><input type="range" id="lyHillK" min="10" max="100" step="5" aria-label="Hill shading strength"></div></div>
+ <div class="row"><label><input type="checkbox" id="lyNames"> Place names</label><div class="sub"><span>how many</span><select id="lyNameLvl" aria-label="How many place names"><option value="0">Fewer</option><option value="1">Some</option><option value="2">Lots</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyLines"> Borders and counties</label><div class="sub"><span>strength</span><input type="range" id="lyLineK" min="10" max="100" step="5" aria-label="Border line strength"></div></div>
+ <div class="row"><label style="font-weight:600">Wind colour</label><div class="sub"><span>strength</span><input type="range" id="lyColour" min="0" max="100" step="5" aria-label="Colour strength"></div></div>
+ <div class="row"><label><input type="checkbox" id="lySea"> Winds at sea</label></div>
+ <div class="row"><label for="lyFlow" style="font-weight:600">Wind direction</label><div class="sub"><select id="lyFlow" aria-label="Wind direction"><option value="lines">Moving lines</option><option value="arrows">Arrows</option><option value="off">Off</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyFarms"> Wind farms</label></div>
+ <button class="reset" id="lyReset">Reset layers</button>
+</div>`;
+    return d; } });
+  map.addControl(new Ctl());
+  const q = id => document.getElementById(id), btn = map.getContainer().querySelector(".lyrBtn"), pan = q("lyrPanel");
+  btn.onclick = () => { const o = pan.hidden; pan.hidden = !o; btn.setAttribute("aria-expanded", o); };
+  const sync = () => { q("lyBase").value = LY.base; q("lyHills").checked = LY.hills; q("lyHillK").value = LY.hillK; q("lyNames").checked = LY.names; q("lyNameLvl").value = LY.nameLvl; q("lyLines").checked = LY.lines; q("lyLineK").value = LY.lineK; q("lyColour").value = LY.colour; q("lySea").checked = LY.sea; q("lyFlow").value = LY.flow; q("lyFarms").checked = S.farms; };
+  window.syncLayers = sync;
+  const on = (id, ev, f, retile) => q(id).addEventListener(ev, e => { f(e.target); saveLY(); retile ? setTiles() : applyLayers(); });
+  on("lyBase", "change", t => LY.base = t.value, true);
+  on("lyHills", "change", t => LY.hills = t.checked); on("lyHillK", "input", t => { LY.hillK = +t.value; LY.hills = q("lyHills").checked = true; });
+  on("lyNames", "change", t => LY.names = t.checked); on("lyNameLvl", "change", t => { LY.nameLvl = +t.value; LY.names = q("lyNames").checked = true; });
+  on("lyLines", "change", t => LY.lines = t.checked); on("lyLineK", "input", t => { LY.lineK = +t.value; LY.lines = q("lyLines").checked = true; });
+  on("lyColour", "input", t => LY.colour = +t.value);
+  on("lySea", "change", t => LY.sea = t.checked);
+  on("lyFlow", "change", t => LY.flow = t.value);
+  q("lyFarms").addEventListener("change", e => setFarms(e.target.checked));
+  q("lyReset").onclick = () => { Object.assign(LY, LYDEF); saveLY(); sync(); setTiles(); };
+  sync();
+})();
+
+/* the wind layer: tiles drawn in the browser from the coded grids */
+const RAD = 180 / Math.PI;
+let windL = null;
+function colourAt(lat, lon) {
+  const i = lat < WG.top && lat > WG.top - WG.h * WG.cell ? wIdx(lat, lon) : -1;
+  const land = i >= 0 && D.year.idx[i];
+  if (S.mode === "speed") {
+    const img = S.month ? D.m[S.month - 1] : D.year, v = img && i >= 0 ? img.idx[i] : 0;
+    if (v) { const c = img.pal[v]; return [c[0], c[1], c[2], 235]; }
+    if (!LY.sea || land) return null;
+    const c = windRGB(ncep(D.s, lat, lon, nm())); return [c[0], c[1], c[2], 120];
+  }
+  const img = S.mode === "seas" ? D.seas : D.peak; if (!land || !img || !img.idx[i]) return null;
+  const c = img.pal[img.idx[i]]; return [c[0], c[1], c[2], 230];
+}
+const WindLayer = L.GridLayer.extend({
+  createTile(c) {
+    const t = document.createElement("canvas"); t.width = t.height = 256;
+    if (!D.year || (S.mode === "speed" && S.month && !D.m[S.month - 1]) || (S.mode === "seas" && !D.seas) || (S.mode === "peak" && !D.peak)) return t;
+    const ctx = t.getContext("2d"), img = ctx.createImageData(256, 256), d = img.data, n = 256 * Math.pow(2, c.z);
+    const lons = new Float64Array(256); for (let i = 0; i < 256; i++) lons[i] = (c.x * 256 + i + .5) / n * 360 - 180;
+    for (let j = 0; j < 256; j++) { const y = Math.PI * (1 - 2 * (c.y * 256 + j + .5) / n), lat = Math.atan(Math.sinh(y)) * RAD;
+      for (let i = 0; i < 256; i++) { const col = colourAt(lat, lons[i]); if (!col) continue; const q = (j * 256 + i) * 4; d[q] = col[0]; d[q + 1] = col[1]; d[q + 2] = col[2]; d[q + 3] = col[3]; } }
+    ctx.putImageData(img, 0, 0); return t;
+  }
+});
+function render() {
+  if (!D.year) return;
+  if (!windL) windL = new WindLayer({ pane: "wind", opacity: LY.colour / 100, maxNativeZoom: 9, attribution: "Wind: WorldClim 2.1; NCEP/NCAR Reanalysis 1" }).addTo(map);
+  else windL.redraw();
+  legend(); flowReset();
+}
+
+/* moving lines (particles advected by the NCEP wind) or arrows, on a canvas inside the map */
+const cv = document.createElement("canvas"); cv.className = "flowcv"; map.getContainer().appendChild(cv);
+const cx = cv.getContext("2d");
+let parts = [], anim = null, moving = false;
+function sizeCv() { const r = map.getContainer().getBoundingClientRect(), k = devicePixelRatio || 1; cv.width = r.width * k; cv.height = r.height * k; cv.style.width = r.width + "px"; cv.style.height = r.height + "px"; cx.setTransform(k, 0, 0, k, 0, 0); }
+function uvAt(x, y) { const ll = map.containerPointToLatLng([x, y]); if (Math.abs(ll.lat) > 84) return null; const m = nm(); return [ncep(D.u, ll.lat, ll.lng, m), ncep(D.v, ll.lat, ll.lng, m)]; }
+function flowReset() {
+  if (anim) { cancelAnimationFrame(anim); anim = null; }
+  sizeCv(); const W = cv.width / (devicePixelRatio || 1), H = cv.height / (devicePixelRatio || 1); cx.clearRect(0, 0, W, H);
+  if (!D.u || LY.flow === "off" || moving) return;
+  const ink = darkLines() ? "rgba(240,244,248," : "rgba(18,28,42,";
+  if (LY.flow === "arrows" || reduced) {
+    const g = W < 600 ? 34 : 42; cx.strokeStyle = ink + "0.75)"; cx.fillStyle = ink + "0.75)"; cx.lineWidth = 1.2;
+    for (let y = g / 2; y < H; y += g) for (let x = g / 2; x < W; x += g) { const w = uvAt(x, y); if (!w) continue; const s = Math.hypot(w[0], w[1]); if (s < .3) continue;
+      const L0 = Math.min(g * .48, 5 + s * 2.2), dx = w[0] / s, dy = -w[1] / s, x0 = x - dx * L0 / 2, y0 = y - dy * L0 / 2, x1 = x + dx * L0 / 2, y1 = y + dy * L0 / 2;
+      cx.beginPath(); cx.moveTo(x0, y0); cx.lineTo(x1, y1); cx.stroke(); cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x1 - dx * 5 - dy * 3, y1 - dy * 5 + dx * 3); cx.lineTo(x1 - dx * 5 + dy * 3, y1 - dy * 5 - dx * 3); cx.closePath(); cx.fill(); }
+    return;
+  }
+  const n = Math.round(Math.min(3000, W * H / 260)); parts = [];
+  const spawn = () => ({ x: Math.random() * W, y: Math.random() * H, age: Math.floor(Math.random() * 90) });
+  for (let i = 0; i < n; i++) parts.push(spawn());
+  const step = () => {
+    cx.globalCompositeOperation = "destination-in"; cx.fillStyle = "rgba(0,0,0,0.92)"; cx.fillRect(0, 0, W, H); cx.globalCompositeOperation = "source-over";
+    cx.strokeStyle = ink + "0.8)"; cx.lineWidth = 1.1; cx.beginPath();
+    for (const p of parts) {
+      const w = uvAt(p.x, p.y);
+      if (!w || p.age++ > 90) { Object.assign(p, spawn(), { age: 0 }); continue; }
+      const nx = p.x + w[0] * .45, ny = p.y - w[1] * .45;
+      cx.moveTo(p.x, p.y); cx.lineTo(nx, ny); p.x = nx; p.y = ny;
+      if (nx < 0 || ny < 0 || nx > W || ny > H) Object.assign(p, spawn(), { age: 0 });
+    }
+    cx.stroke(); anim = requestAnimationFrame(step);
+  };
+  step();
+}
+map.on("movestart zoomstart", () => { moving = true; flowReset(); });
+map.on("moveend zoomend", () => { moving = false; flowReset(); });
+map.on("resize", flowReset);
+document.addEventListener("visibilitychange", () => { if (document.hidden && anim) { cancelAnimationFrame(anim); anim = null; } else if (!document.hidden) flowReset(); });
+
+/* wind farms */
+let FARMS = null, farmL = null;
+const farmR = L.canvas({ pane: "farms", padding: .3 });
+function farmPopup(f) {
+  const site = f[7] === "l" ? "on land" : f[7] === "c" ? "on the coast (wind from the nearest land cells)" : "at sea (no WorldClim value)";
+  return `<b class="h">${esc(f[0])}</b>${esc(f[8])}<br>${fmt(f[3])} MW${f[4] ? ", commissioned " + f[4] : ""}<br>Site: ${site}${f[5] != null ? `<br>Mean wind at 10 m: <b>${f1(f[5])} m/s</b>` : ""}${f[6] != null ? `<br>Windier than ${f[6]}% of the country's land` : ""}<br><span style="color:var(--muted)">WRI Global Power Plant Database, 2021</span>`;
+}
+async function setFarms(on) {
+  S.farms = on; document.getElementById("farmBtn").setAttribute("aria-pressed", on); if (window.syncLayers) document.getElementById("lyFarms").checked = on;
+  if (!on) { if (farmL) map.removeLayer(farmL); return; }
+  if (!FARMS) { msg.textContent = "Loading wind farms..."; FARMS = await fetch("data/page/farms.json").then(r => r.json()); msg.textContent = ""; }
+  if (!farmL) { farmL = L.layerGroup(); for (const f of FARMS) L.circleMarker([f[1], f[2]], { renderer: farmR, radius: 2.2 + Math.sqrt(f[3]) / 3.2, color: "#fff", weight: 1, fillColor: f[7] === "s" ? "#24356B" : "#D9583B", fillOpacity: .85 }).bindPopup(farmPopup(f)).addTo(farmL); }
+  farmL.addTo(map);
+}
+document.getElementById("farmBtn").onclick = () => setFarms(!S.farms);
+
+/* legend */
+function legend() {
+  const box = document.getElementById("legend"); box.innerHTML = ""; const t = document.getElementById("legTitle");
+  const W0 = 300, s = el("svg", { viewBox: `0 0 ${W0} 108` }, box), x0 = 14, x1 = W0 - 14;
+  if (S.mode === "seas") {
+    t.textContent = "Seasonality: windiest month / calmest month";
+    const g = el("linearGradient", { id: "lgs" }, s); for (let k = 0; k <= 20; k++) { const r = 1 + k / 20 * 3; el("stop", { offset: k / 20, "stop-color": rgb(seasRGB(r)) }, g); }
+    el("rect", { x: x0, y: 12, width: x1 - x0, height: 18, fill: "url(#lgs)", stroke: css("--border") }, s);
+    [1, 1.5, 2, 3, 4].forEach(r => { const x = x0 + (x1 - x0) * (r - 1) / 3; el("line", { x1: x, x2: x, y1: 30, y2: 36, stroke: css("--fg") }, s); lbl(s, x, 50, r === 4 ? "4×+" : r + "×", "lab s", "middle"); });
+    lbl(s, x0, 70, "steady all year", "lab s m"); lbl(s, x1, 70, "strongly seasonal", "lab s m", "end");
+    lbl(s, x0, 88, "Land only. Grey: mean wind under 1.5 m/s.", "lab s m"); lbl(s, x0, 102, "The month slider moves the wind lines.", "lab s m"); return;
+  }
+  if (S.mode === "peak") {
+    t.textContent = "Windiest month of the year";
+    MON.forEach((m, k) => { const col = k % 6, row = Math.floor(k / 6), x = x0 + col * 46, y = 12 + row * 34; el("rect", { x, y, width: 40, height: 14, fill: rgb(MCOL[k]) }, s); lbl(s, x + 20, y + 27, m.slice(0, 3), "lab s", "middle"); });
+    lbl(s, x0, 88, "Land only, from WorldClim monthly means.", "lab s m"); lbl(s, x0, 102, "The month slider moves the wind lines.", "lab s m"); return;
+  }
+  t.textContent = (S.month ? MON[S.month - 1] + ": " : "") + "mean wind speed at 10 m";
+  const g = el("linearGradient", { id: "lgw" }, s); for (let k = 0; k <= 32; k++) el("stop", { offset: k / 32, "stop-color": rgb(windRGB(k / 2)) }, g);
+  el("rect", { x: x0, y: 12, width: x1 - x0, height: 18, fill: "url(#lgw)", stroke: css("--border") }, s);
+  [0, 2, 4, 6, 8, 10, 12, 14, 16].forEach(v => { const x = x0 + (x1 - x0) * v / 16; el("line", { x1: x, x2: x, y1: 30, y2: 36, stroke: css("--fg") }, s); lbl(s, x, 50, v, "lab s", "middle"); });
+  lbl(s, x1, 66, "metres per second", "lab s m", "end");
+  lbl(s, x0, 84, "Land: WorldClim in colour classes, 9 km.", "lab s m"); lbl(s, x0, 98, "Sea, fainter: NCEP reanalysis, 2.5°.", "lab s m");
+}
+
+/* modes and months */
+async function setMode(m) { S.mode = m; document.querySelectorAll("#modeBtns .btn").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === m)); await loadModeImg(m); render(); if (S.sel) readout(S.sel); }
+document.querySelectorAll("#modeBtns .btn").forEach(b => b.onclick = () => setMode(b.dataset.m));
+const mIn = document.getElementById("month"), mOut = document.getElementById("monthOut");
+async function setMonth(m) { S.month = m; mIn.value = m; mOut.textContent = m ? MON[m - 1] : "Whole year"; if (m) await loadMonth(m); render(); if (S.sel) readout(S.sel); }
+mIn.addEventListener("input", () => setMonth(+mIn.value));
+let playT = null; const playB = document.getElementById("play");
+playB.onclick = async () => {
+  if (playT) { clearInterval(playT); playT = null; playB.textContent = "▶ Play"; return; }
+  if (S.mode !== "speed") setMode("speed");
+  await loadMonths(); playB.textContent = "❚❚ Pause";
+  const adv = () => setMonth(S.month >= 12 ? 1 : S.month + 1); adv(); playT = setInterval(adv, 1500);
+};
+function goView(v) { if (v === "uk") map.fitBounds([[49.9, -10.8], [60.9, 2.0]]); else if (v === "monsoon") { map.setView([12, 72], innerWidth < 600 ? 2.5 : 3.5); } else map.setView([25, 10], 2); }
+document.querySelectorAll("#viewBtns .btn").forEach(b => b.onclick = () => { goView(b.dataset.v); if (b.dataset.v === "monsoon") { setMode("speed"); setMonth(7); } document.getElementById("lmap").scrollIntoView({ block: "nearest", behavior: "smooth" }); });
+
+/* readout */
+let pin = null;
+const hav = (a, b, c, d) => { const p = Math.PI / 180, x = Math.sin((c - a) * p / 2) ** 2 + Math.cos(a * p) * Math.cos(c * p) * Math.sin((d - b) * p / 2) ** 2; return 2 * 6371 * Math.asin(Math.sqrt(x)); };
+const PTS = ["north", "north-north-east", "north-east", "east-north-east", "east", "east-south-east", "south-east", "south-south-east", "south", "south-south-west", "south-west", "west-south-west", "west", "west-north-west", "north-west", "north-north-west"];
+function readout(p) {
+  S.sel = p; const box = document.getElementById("readout"); if (!D.year) return;
+  const si = p.lat < 84 && p.lat > -60 ? sIdx(p.lat, p.lon) : -1, land = sumVal(0, si) != null;
+  let near = ""; if (PLACES) { let bd = 80, bn = null; for (const c of PLACES) { if (Math.abs(c[1] - p.lat) > 1 || Math.abs(c[2] - p.lon) > 1.5) continue; const d = hav(p.lat, p.lon, c[1], c[2]); if (d < bd) { bd = d; bn = c; } } if (bn && !p.name) near = `near ${bn[0]}, ${bn[4]}`; }
+  const m = nm(), u = ncep(D.u, p.lat, p.lon, m), v = ncep(D.v, p.lat, p.lon, m), sp = ncep(D.s, p.lat, p.lon, m), dir = (Math.atan2(-u, -v) * RAD + 360) % 360;
+  const months = land ? Array.from({ length: 12 }, (_, k) => sumVal(k + 1, si)) : null, val = land ? sumVal(S.month, si) : sp;
+  const when = S.month ? MON[S.month - 1] : "Whole year";
+  let h = `<b>${esc(p.name || "This spot")}</b>${near ? " · " + esc(near) : ""}<span class="big"><span class="sw" style="background:${rgb(windRGB(val || 0))}"></span>${land ? "about " : ""}${f1(val)} m/s</span>`;
+  h += land ? `${when}, mean wind at 10 m over land, from a summary of WorldClim (1970 to 2000): the average of this 0.5° square, rounded to 0.5 m/s. The map colours show the 9 km detail.` : `${when}, mean wind near the surface from the NCEP reanalysis (1991 to 2020, 2.5° cells).`;
+  if (land) { const mx = Math.max(...months), mn = Math.min(...months); if (S.month) h += ` Whole year about ${f1(sumVal(0, si))} m/s.`; h += `<br>Windiest month ${MON[months.indexOf(mx)]}${mn > 0 ? `; roughly ${(mx / mn).toFixed(1)}× the calmest` : ""}.`; }
+  h += `<br>Prevailing flow (NCEP, ${S.month ? MON[S.month - 1] : "whole year"}): from the ${PTS[Math.round(dir / 22.5) % 16]}, ${f1(Math.hypot(u, v))} m/s as an average vector.`;
+  box.innerHTML = h;
+  // 12 month bars
+  const vals = months || Array.from({ length: 12 }, (_, k) => ncep(D.s, p.lat, p.lon, k));
+  const s = el("svg", { viewBox: "0 0 300 92" }), mx = Math.max(4, ...vals), bw = 300 / 12;
+  vals.forEach((x, k) => { const hgt = x / mx * 54, r = el("rect", { x: k * bw + 2, y: 70 - hgt, width: bw - 4, height: hgt, fill: rgb(windRGB(x)), stroke: k + 1 === S.month ? css("--fg") : "none", "stroke-width": 2 }, s); lbl(s, k * bw + bw / 2, 86, MON[k][0], "lab s m", "middle"); hover(r, `${MON[k]}: ${f1(x)} m/s`); });
+  lbl(s, 2, 9, `Monthly means (${months ? "WorldClim, 0.5°" : "NCEP, 2.5°"}), top ${f1(mx)}`, "lab s m");
+  box.appendChild(s);
+}
+function choose(p, fly = true) {
+  if (pin) map.removeLayer(pin); pin = L.marker([p.lat, p.lon], { icon: L.divIcon({ className: "pin", iconSize: [18, 18] }), title: p.name || "Selected point" }).addTo(map);
+  if (p.bounds) map.fitBounds(p.bounds); else if (fly) map.setView([p.lat, p.lon], Math.max(map.getZoom(), 6));
+  readout(p);
+  if (innerWidth < 900 && fly) document.getElementById("lmap").scrollIntoView({ block: "start", behavior: "smooth" });
+}
+map.on("click", e => choose({ lat: e.latlng.lat, lon: ((e.latlng.lng + 540) % 360) - 180, name: "" }, false));
+
+/* search: places and countries */
+const qi = document.getElementById("q"), sug = document.getElementById("sug");
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+let hits = [], hsel = -1, placesP = null;
+function loadPlaces() { if (placesP) return placesP; placesP = fetch("data/page/places.json").then(r => r.json()).then(j => { PLACES = j.places; CTRY = j.countries; placeNames(); }); return placesP; }
+qi.addEventListener("focus", loadPlaces);
+qi.addEventListener("input", async () => {
+  const s = norm(qi.value.trim()); if (s.length < 2) { sug.style.display = "none"; qi.setAttribute("aria-expanded", "false"); return; }
+  await loadPlaces(); const out = [];
+  for (const c of CTRY) if (norm(c[0]).startsWith(s)) out.push({ name: c[0], lat: (c[1] + c[3]) / 2, lon: (c[2] + c[4]) / 2, bounds: [[c[1], c[2]], [c[3], c[4]]], sub: "country", r: -1 });
+  for (const p of PLACES) { if (norm(p[0]).startsWith(s)) out.push({ name: p[0], lat: p[1], lon: p[2], sub: p[4] + (p[3] ? " · " + fmt(p[3]) + " people" : ""), r: -p[3] }); if (out.length > 60) break; }
+  hits = out.sort((a, b) => (norm(a.name) === s ? 0 : 1) - (norm(b.name) === s ? 0 : 1) || a.r - b.r).slice(0, 12);
+  sug.innerHTML = hits.map((h, i) => `<li role="option" data-i="${i}">${esc(h.name)} <span>${esc(h.sub)}</span></li>`).join(""); hsel = -1;
+  sug.style.display = hits.length ? "block" : "none"; qi.setAttribute("aria-expanded", hits.length ? "true" : "false");
+});
+sug.addEventListener("click", e => { const li = e.target.closest("li"); if (li) pick(+li.dataset.i); });
+qi.addEventListener("keydown", e => { if (!hits.length) return; if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); hsel = (hsel + (e.key === "ArrowDown" ? 1 : -1) + hits.length) % hits.length; [...sug.children].forEach((li, i) => li.setAttribute("aria-selected", i === hsel)); } else if (e.key === "Enter") { e.preventDefault(); pick(Math.max(0, hsel)); } });
+function pick(i) { const h = hits[i]; if (!h) return; qi.value = h.name; sug.style.display = "none"; qi.setAttribute("aria-expanded", "false"); choose(h); }
+document.getElementById("geo").onclick = () => navigator.geolocation && navigator.geolocation.getCurrentPosition(p => choose({ lat: p.coords.latitude, lon: p.coords.longitude, name: "Your location" }), () => { msg.textContent = "Location not available."; });
+document.addEventListener("click", e => { if (!e.target.closest(".searchbox")) sug.style.display = "none"; });
+
+setTiles();
+fetch("data/page/borders.json").then(r => r.json()).then(b => { BORD = b; drawLines(); });
+loadPlaces();
+loadBase().then(render);
+document.getElementById("theme").onclick = () => { const r = document.documentElement; r.dataset.theme = isDark() ? "light" : "dark"; redraws.forEach(f => f()); legend(); };
+window.goPlace = (lat, lon, name) => { choose({ lat, lon, name }); };
+
+/*CHARTS*/
+</script>
+/*FULLSCREEN*/
+</body>
+</html>

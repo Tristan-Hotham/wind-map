@@ -1,0 +1,161 @@
+<!-- wp:paragraph -->
+<p><em>I mapped the world's winds month by month: the trade winds, the westerlies, the Roaring Forties and the monsoon that turns around every year. Then I asked whether the world's wind farms actually stand where the wind blows. Mostly they do: {{farms.share_cap_above_median|pct}} of onshore wind farm capacity sits on ground windier than its country's median.</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://maps.tristanhotham.com/wind-map/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="{{DOI_URL}}">Read the paper</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:paragraph -->
+<p>Anyone who lives in Britain gets to know the wind. It comes, more often than not, from the south-west, wet from the Atlantic, and it is strongest in winter. But I had never seen the whole pattern it belongs to, so I drew it. Over land I used WorldClim, a set of monthly climate maps built from weather stations, which gives the average wind 10 m above the ground for every 9 km square. For the oceans and for the direction of the wind I used the NCEP/NCAR reanalysis, a weather model fed with three decades of observations.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_world_map.png|World map of mean wind speed. Land is pale green in the tropics and interior, deeper teal and blue over the Great Plains, the Sahara, Patagonia and northern Europe, and plum over Greenland. Over the faded oceans, dark streamlines show the trade winds blowing west either side of the equator, swirling westerlies in the north Atlantic and Pacific, and dense parallel lines racing east around the Southern Ocean.|The world's average winds. Land: WorldClim, 10 m above the ground, 1970 to 2000. Sea, faded, and the flow lines: NCEP/NCAR reanalysis, 1991 to 2020.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Belts around the world</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Seen from far enough away, the winds are a set of belts. Either side of the equator the trade winds blow towards it and to the west, from the north-east in the northern hemisphere and the south-east in the southern, at around {{circ.trade_n_speed|f1}} to {{circ.trade_s_speed|f1}} m/s over the oceans. They are astonishingly steady. If the wind always blew from exactly the same direction, its average as an arrow would equal its average speed; in the trades the arrow keeps {{circ.trade_steady|pct}} of it. In the northern westerlies, where storm after storm swings the wind round, it keeps {{circ.west_steady_n|pct}}.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The strongest belt is in the far south. Between 40° and 50° S, the Roaring Forties, nothing but the tip of South America stands in the way of the westerlies, and over the ocean they average {{circ.roar_s|f1}} m/s, against {{circ.roar_n|f1}} m/s at the same latitudes in the north. Further south, in the Furious Fifties, the band around {{circ.sh_max_lat|abs1}}° S averages {{circ.sh_max_speed|f1}} m/s. And the southern belt keeps going all year: in July the northern oceans at 40° to 50° N drop to {{circ.roar_n_Jul|f1}} m/s while the Forties blow at {{circ.roar_s_Jul|f1}}.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_belts.png|Chart of average west to east wind over the oceans by latitude. Gold bars point left (easterly) between about 30° N and 30° S, peaking near 15° N and 15° S as the trade winds. Teal bars point right (westerly) from 30° to 60° in both hemispheres, far longer in the south, peaking near 50° S. A navy line of average speed peaks at {{circ.sh_max_speed|f1}} m/s near {{circ.sh_max_lat|abs1}}° S.|The wind belts: the average west to east wind over the oceans at each latitude (bars) and the average speed (line).}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">The wind that turns around</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Over the Arabian Sea the wind changes sides with the seasons. In January it comes from the {{monsoon.arabian_jan.from_pt|raw}} at {{monsoon.arabian_jan.vec|f1}} m/s, dry air flowing off Asia. In July it comes from the {{monsoon.arabian_jul.from_pt|raw}} at {{monsoon.arabian_jul.vec|f1}} m/s, wet air drawn towards the hot land of India, and off the Horn of Africa it becomes a jet averaging {{monsoon.somali_jul.vec|f1}} m/s. That is the monsoon. Counting every patch of sea and land where the January and July winds point at least 135° apart, {{monsoon.reversal_share|pct}} of the area between 60° N and 60° S turns its wind around between winter and summer.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_monsoon.png|Two maps of the Indian Ocean. In January, moderate winds in blue curve from the north-east off Asia across the Arabian Sea and Bay of Bengal. In July, a band of pink and orange, the strongest winds, sweeps from the south-west off Somalia across the Arabian Sea towards India, with flow lines curving north-east.|The Indian Ocean in January and July: the monsoon reverses the wind.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Ice caps and islands</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Over land the wind is far weaker, dragged back by hills, forests and towns. The average across the world's land outside Antarctica is {{land.mean|f1}} m/s, and only {{land.share_ge5|pct}} of it averages 5 m/s or more. The windiest square is on the Vatnajökull ice cap in Iceland, at {{windiest_places.0.wind|f1}} m/s, where cold air pours off the ice. After it come Jan Mayen, the Greenland ice sheet, the Patagonian ice fields and a scatter of islands in the Southern Ocean. These are also the places with the fewest weather stations, so they are the least certain numbers on the map.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_windiest.png|Bar chart of the 20 windiest places on land outside Antarctica. Vatnajökull ice cap, Iceland, leads at {{windiest_places.0.wind|f1}} m/s, then Jan Mayen {{windiest_places.1.wind|f1}}, the East Greenland ice sheet {{windiest_places.2.wind|f1}} and the Southern Patagonian Ice Field {{windiest_places.3.wind|f1}}, followed by north-west Greenland, Tierra del Fuego, Heard, Macquarie, Bouvet, Kerguelen and other islands near 9 to 11 m/s, with St Kilda, the Faroes and Fiordland near {{windiest_places.19.wind|f1}}.|The 20 windiest places on land outside Antarctica, each at least 500 km from the next.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Among cities of a million or more, Marseille is the windiest ({{cities_windiest.0.wind|f1}} m/s), thanks to the mistral, followed by The Hague, Melbourne, Auckland and Adelaide. The calmest are in tropical highlands and sheltered valleys: Bogotá, Cali, Srinagar, Medellín and Mandalay, all under {{cities_calmest.4.wind|f1}} m/s.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Spring, not winter</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Here is the result that surprised me most. Averaged over all the land of the northern hemisphere, the windiest month is {{land.nh_windiest_month|raw}} and the calmest {{land.nh_calmest_month|raw}}. Across the northern land beyond the tropics, {{derived.nh_spring_share|pct}} has its windiest month in March, April or May. In spring the land warms fast while the sea and the Arctic stay cold, and that contrast drives the wind; in winter much of the northern interior lies under still, freezing air. The south has its own spring peak, in {{land.sh_windiest_month|raw}}.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_seasons.png|Left, a world map of how seasonal the wind is: most land is pale yellow, a ratio below 1.5, with deep orange and red over north-east Siberia, Mongolia, the Yukon, northern India and the monsoon coasts. Right, a line chart of monthly wind: northern land peaks in {{land.nh_windiest_month|raw}}, southern land in {{land.sh_windiest_month|raw}}, and the UK, far windier, peaks in {{uk.windiest_month|raw}} and dips in {{uk.calmest_month|raw}}.|Left: how much windier the windiest month is than the calmest. Right: the average wind over land each month.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>The most seasonal winds are in two kinds of place. In the interior of Siberia, Mongolia and the Yukon, winter air lies dead calm under great cold highs and the wind only wakes up in May. And on the monsoon coasts, Kutch and Odisha in India, the Maldives and the Chagos islands, the wind blows hard in the wet season and fades in the dry.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Are the wind farms in the windy places?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The World Resources Institute's Global Power Plant Database lists {{farms.n|int}} wind farms with {{farms.cap_gw|int}} GW of capacity. It is a 2021 snapshot with patchy coverage: Germany and India, for instance, appear with only a small fraction of their real fleets. But for the farms it does list, I read the wind at each site and compared it with the rest of its country. Weighted by capacity, the average onshore farm stands on ground windier than {{farms.land_cw_pctile|pct}} of its country's land, and {{farms.share_cap_above_median|pct}} of the capacity is on the windier half.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>Mexico's wind farms stand on ground windier than {{fc.MEX.farm_cw_pctile|pct}} of the country: almost all of them crowd into one windy gap in the mountains, the Isthmus of Tehuantepec.</p></blockquote></figure>
+<!-- /wp:pullquote -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_farms.png|Dumbbell chart for {{farm_countries_n|int}} countries comparing average wind over the country's land (grey dot) with the capacity-weighted wind at its listed onshore wind farms (coral dot). Mexico, Brazil, Australia and Norway show long coral bars to the right with farms windier than {{fc.NOR.farm_cw_pctile|pct}} to {{fc.MEX.farm_cw_pctile|pct}} of the land; the United States {{fc.USA.farm_cw_pctile|pct}}, China {{fc.CHN.farm_cw_pctile|pct}}, the UK {{fc.GBR.farm_cw_pctile|pct}}; Ireland, Morocco and Sweden just under half, and Chile {{fc.CHL.farm_cw_pctile|pct}}, its farms well below the country average.|Wind at the farms against the country's land. Right: how much of the country's land is less windy than the average farm.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>In {{farm_countries_windier|int}} of the {{farm_countries_n|int}} countries with substantial listed capacity on land, the farms are windier than the land as a whole. Brazil's line its windy north-east coast at {{fc.BRA.farm_cw_wind|f1}} m/s, against {{fc.BRA.land_mean|f1}} for the country. The exceptions make sense too. Chile's farms are in the north and centre, near people and the grid, while its windiest land is in empty Patagonia. In the UK the farms are only a little windier than the land, partly because Britain's windiest ground is islands and mountain tops, and partly because so much of its newest wind is at sea.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">A windy corner of the world</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The UK's land averages {{uk.mean|f1}} m/s, {{derived.uk_vs_land|f1}} times the world's; among countries bigger than 50,000 km², only Iceland, Greenland and Western Sahara are windier. Scotland is windiest ({{uk.Scotland|f1}} m/s), and the windiest counties are its islands: Shetland ({{uk_county.Shetland Islands.wind|f1}}), the Western Isles and Orkney. England's windiest is Cornwall ({{uk_county.Cornwall.wind|f1}}); its calmest corner is the sheltered Welsh borders, with Herefordshire at {{uk_county.Herefordshire.wind|f1}}. The single windiest square in the UK is St Kilda, at {{uk.max.wind|f1}} m/s. Unlike most northern land, British wind is a winter wind: {{uk.months.0|f1}} m/s in January, {{uk.months.7|f1}} in August.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_uk.png|Map of the UK and Ireland coloured by mean wind speed: deep blue over the Scottish Highlands and islands, Shetland, the Western Isles, Cornwall and the west coast of Ireland; paler teal over the English Midlands and the Welsh borders. Coral dots for onshore wind farms cluster in southern and northern Scotland, Northern Ireland, west Ireland, Wales and northern England; navy dots for offshore farms ring the east coast of England and Liverpool Bay.|Average wind over the UK and Ireland, with the wind farms in the 2021 database: on land in coral, at sea in navy.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">How I did this</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Land winds are WorldClim 2.1's monthly averages of wind speed 10 m above the ground for 1970 to 2000, in cells of 5 arc minutes (about 9 km). Ocean winds and directions are the NCEP/NCAR Reanalysis 1 long-term monthly means for {{meta.ncep_period|raw}}, at the model's lowest level, on a 2.5° grid. The reanalysis is higher up and coarser and reads windier than WorldClim, so I use it only for the sea and the flow lines and draw it faded. Wind farms are those with primary fuel "Wind" in WRI's Global Power Plant Database v1.3. For each farm on land I took the wind in its 9 km cell and worked out what share of its country's land is less windy.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The limits matter. The wind 10 m up is not the wind at a turbine hub 100 m up, and a 9 km square cannot see the ridge a farm stands on, so if anything the farms are windier than these numbers say. Averages hide the gusts and calm spells that matter for power. WorldClim is least certain where stations are few, which is exactly where the windiest places are. And the power plant database is a 2021 snapshot that misses many farms. WorldClim's data are free for non-commercial use, so I publish images and summaries rather than the grids themselves.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://maps.tristanhotham.com/wind-map/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="{{DOI_URL}}">Read the paper</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://github.com/Tristan-Hotham/wind-map">Data and code</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Notes and sources</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Land wind: Fick, S.E. and Hijmans, R.J. (2017) <a href="https://doi.org/10.1002/joc.5086">WorldClim 2: new 1 km spatial resolution climate surfaces for global land areas</a>, International Journal of Climatology 37: 4302 to 4315. Free for research and non-commercial use with citation.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Ocean wind and direction: <a href="https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.derived.html">NCEP/NCAR Reanalysis 1</a>, NOAA Physical Sciences Laboratory (public domain); Kalnay, E. et al. (1996) The NCEP/NCAR 40-year reanalysis project, Bulletin of the American Meteorological Society 77: 437 to 471.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Wind farms: <a href="https://datasets.wri.org/dataset/globalpowerplantdatabase">Global Power Plant Database v1.3</a>, World Resources Institute and partners, 2021 (CC BY 4.0).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Boundaries and places: Natural Earth; UK counties from Office for National Statistics boundaries (Open Government Licence).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Paper, data and code: <a href="{{DOI_URL}}">Zenodo</a> and <a href="https://github.com/Tristan-Hotham/wind-map">GitHub</a>.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->

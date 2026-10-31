@@ -1,0 +1,167 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\newfontfamily\headfont{Inter}[UprightFont=*-ExtraBold,BoldFont=*-ExtraBold,Extension=.otf,Path=/usr/share/fonts/opentype/inter/]
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{graphicx,booktabs,float,caption,array,xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{setspace}
+\setstretch{1.05}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\titleformat{\section}{\headfont\Large}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\headfont\large}{\thesubsection}{0.8em}{}
+\captionsetup{font=small,labelfont=bf}
+\urlstyle{same}
+\hypersetup{pdftitle={Where the Wind Blows},pdfauthor={Tristan Hotham}}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries Where the Wind Blows\\[2pt] The World's Winds Month by Month, Its Windiest Places, and Whether Wind Farms Stand in Them\par}
+\vspace{1.2em}
+{\large Tristan Hotham\par}
+\vspace{0.3em}
+{\small Independent researcher\\
+ORCID: 0000-0003-4931-9349\\
+DOI: {{DOILINK}}\par}
+\vspace{0.8em}
+2026
+\end{center}
+
+\begin{quote}
+\small
+\begin{center}\textbf{Abstract}\end{center}
+I map mean wind speed over the world's land month by month from WorldClim 2.1 (10 m above the ground, 1970 to 2000, 5 arc minutes) and set it beside the near-surface circulation of the NCEP/NCAR Reanalysis 1 (long-term means for {{meta.ncep_period|raw}}, 2.5 degrees). Over the oceans the trade winds average {{circ.trade_n_speed|f1}} m/s in the north and {{circ.trade_s_speed|f1}} m/s in the south and are the steadiest winds on Earth; the Roaring Forties (40 to 50 degrees south) average {{circ.roar_s|f1}} m/s against {{circ.roar_n|f1}} m/s at the same northern latitudes; and the monsoon reverses the wind over {{monsoon.reversal_share|pct}} of the area between 60 degrees north and south. Over land outside Antarctica the mean wind is {{land.mean|f1}} m/s; the windiest places are ice caps and ocean islands, led by Vatnajökull in Iceland ({{windiest_places.0.wind|f1}} m/s). On northern land the windiest month is {{land.nh_windiest_month|raw}}, not midwinter. Setting the {{farms.n|int}} wind farms of the WRI Global Power Plant Database (a 2021 snapshot) against the wind at their sites, {{farms.share_cap_above_median|pct}} of onshore capacity stands on ground windier than its country's median, and in {{farm_countries_windier|int}} of {{farm_countries_n|int}} countries with substantial listed capacity the farms are windier than the national land average. The UK averages {{uk.mean|f1}} m/s over land, {{derived.uk_vs_land|f1}} times the world's land average.
+
+\textbf{Keywords:} wind; wind speed; atmospheric circulation; trade winds; westerlies; monsoon; seasonality; wind farms; WorldClim; NCEP/NCAR reanalysis; data visualisation
+\end{quote}
+
+\section{Introduction}
+
+The winds of the world fall into belts that sailors named long before anyone could explain them: easterly trade winds either side of the equator, westerlies in the middle latitudes, and in the far south the Roaring Forties, where the westerlies circle the globe with almost no land in the way. In southern Asia and a few other regions the prevailing wind reverses between winter and summer, the monsoon. Over land the picture is broken up by mountains, coasts and the roughness of forests and towns, which slow the wind near the ground.
+
+This note maps these patterns from two open climatologies and asks three questions of them. Where are the windiest places on land? How strongly does the wind change with the seasons, and when is it windiest? And do the world's wind farms, as listed in the WRI Global Power Plant Database, stand in the windier parts of their countries? The results are published with an interactive month by month map at \url{https://maps.tristanhotham.com/wind-map/}.
+
+\section{Data}
+
+\subsection{WorldClim 2.1 wind speed}
+WorldClim 2.1 (Fick and Hijmans 2017) provides monthly mean wind speed at 10 m above the ground for 1970 to 2000 over the world's land, interpolated from weather station records with covariates. I use the 5 arc minute version (about 9 km at the equator), {{meta.wc_cells|int}} land cells after removing {{meta.wc_dropped|int}} cells that lie more than one cell from any Natural Earth land (most of them over the Caspian Sea). WorldClim data are free for research and other non-commercial use with citation, and may not be redistributed. I therefore publish only derived pictures and summaries: the interactive map shows the 5 arc minute grids as images in colour classes (0.5 m/s wide up to 8 m/s), and reads out values from a 0.5 degree summary rounded to 0.5 m/s; the tables give area means and values at named points. The grids themselves are not redistributed.
+
+\subsection{NCEP/NCAR Reanalysis 1}
+The NCEP/NCAR Reanalysis 1 (Kalnay et al. 1996) assimilates observations into a fixed global weather model. NOAA's Physical Sciences Laboratory publishes long-term monthly means at the model's lowest level (sigma 0.995, roughly the lowest 40 m of the atmosphere) on a 2.5 degree grid. I use the means for {{meta.ncep_period|raw}} of the zonal and meridional wind and of the wind speed computed from daily vector winds. These data are in the public domain.
+
+\subsection{Wind farms}
+The Global Power Plant Database v1.3 (Global Energy Observatory et al. 2021) lists power plants with their primary fuel, capacity, position and, for some, commissioning year. It is a snapshot of 2021, published under CC BY 4.0. It contains {{farms.n|int}} plants with primary fuel ``Wind'', {{farms.cap_gw|int}} GW in {{farms.n_countries|int}} countries; {{farms.year_share|pct}} have a commissioning year, from {{farms.year_min|int}} to {{farms.year_max|int}}. Coverage is uneven: the United States, China and the United Kingdom hold {{farms.top3_share|pct}} of the listed capacity, while Germany ({{fc_DEU.farms|int}} plants) and India appear with a small fraction of their actual fleets.
+
+\subsection{Boundaries and places}
+Countries, first-level divisions and populated places are from Natural Earth (1:10m and 1:50m); UK counties (England's ceremonial counties, Welsh preserved counties, Scottish council areas and Northern Ireland) from Office for National Statistics boundaries.
+
+\section{Methods}
+
+\textbf{Land averages.} The annual mean of each WorldClim cell is the mean of its twelve monthly values. Averages over areas weight each cell by the cosine of its latitude. ``Land'' excludes Antarctica (south of 60 degrees) unless stated. For countries, overseas territories that hold no listed farms are excluded (for example, the United States is the conterminous 48 states, France is metropolitan France).
+
+\textbf{Seasonality.} For each land cell with an annual mean of at least 1.5 m/s, seasonality is the ratio of the windiest to the calmest monthly mean. {{meta.spike_cells|int}} cells in which one month is below 0.35 or above 2.5 times the mean of its two neighbouring months were treated as station artefacts and excluded from this measure.
+
+\textbf{Windiest places.} Land cells outside Antarctica were ranked by annual mean; a cell was kept if it lay at least 500 km from every cell already kept, giving distinct local peaks. Most seasonal places were found the same way with a 700 km spacing.
+
+\textbf{Circulation.} From the NCEP fields I take ocean cells (less than 10\% land, judged from the WorldClim mask) and average by latitude band. Steadiness is the length of the annual mean wind vector divided by the annual mean wind speed: 1 if the wind always blew from one direction. Monsoon reversal is defined for 2.5 degree cells where both the January and the July mean vectors are at least 2 m/s and point at least 135 degrees apart.
+
+\textbf{Wind farms.} A farm is on land if its point falls in a WorldClim land cell, on the coast if not but a neighbouring cell is land (its wind is then the mean of those cells), and at sea otherwise. For each onshore farm I compute its percentile: the share of its country's land area with a lower annual mean wind than the farm's cell. Country and global figures weight farms by capacity. Country comparisons are restricted to the {{farm_countries_n|int}} countries with at least 400 MW in 8 or more listed onshore farms.
+
+\section{Results}
+
+\subsection{The wind belts}
+Figure \ref{fig:world} shows the annual mean wind with the mean near-surface flow, and Figure \ref{fig:months} four months of it. Over the oceans between 7.5 and 22.5 degrees, the trade winds blow from the north-east in the northern hemisphere (mean zonal wind {{circ.trade_n_u|f1}} m/s, meridional {{circ.trade_n_v|f1}}) and from the south-east in the southern ({{circ.trade_s_u|f1}} and {{circ.trade_s_v|f1}}). Their steadiness is {{circ.trade_steady|f2}}, against {{circ.west_steady_s|f2}} in the southern westerlies (40 to 55 degrees south) and {{circ.west_steady_n|f2}} in the northern westerlies (Figure \ref{fig:belts}).
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=\textwidth]{fig_world_map.png}
+\caption{Annual mean wind speed. Land: WorldClim 2.1 at 10 m, 1970 to 2000. Sea (faded): NCEP/NCAR Reanalysis 1 near-surface wind speed, {{meta.ncep_period|raw}}. Lines: streamlines of the annual mean near-surface wind vector from the reanalysis.}\label{fig:world}
+\end{figure}
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=\textwidth]{fig_months.png}
+\caption{Mean wind speed and near-surface flow in January, April, July and October; sources as in Figure \ref{fig:world}.}\label{fig:months}
+\end{figure}
+
+The southern westerlies are the strongest belt: mean zonal wind {{circ.west_s_u|f1}} m/s against {{circ.west_n_u|f1}} m/s in the north. Over the ocean between 40 and 50 degrees south the mean speed is {{circ.roar_s|f1}} m/s, against {{circ.roar_n|f1}} m/s between 40 and 50 degrees north, a ratio of {{derived.roar_ratio|f2}}. The fastest latitude band is at {{circ.sh_max_lat|abs1}} degrees south ({{circ.sh_max_speed|f1}} m/s), and the windiest ocean cell lies in the southern Indian Ocean at {{circ.ocean_max.lat|abs1}} degrees south, {{circ.ocean_max.lon|abs1}} degrees east ({{circ.ocean_max.speed|f1}} m/s). The southern belt holds its strength through the year: in January the northern band is windier ({{circ.roar_n_Jan|f1}} against {{circ.roar_s_Jan|f1}} m/s), but in July the northern band falls to {{circ.roar_n_Jul|f1}} m/s while the southern rises to {{circ.roar_s_Jul|f1}}. Between 60 degrees north and south, the ocean wind averages {{circ.ocean_mean|f1}} m/s; over solid land the same reanalysis gives {{circ.land_mean_ncep|f1}} m/s.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.86\textwidth]{fig_belts.png}
+\caption{Mean zonal (west to east) wind over the oceans by latitude, NCEP/NCAR Reanalysis 1, {{meta.ncep_period|raw}} (bars; negative values are easterly), and mean wind speed (line).}\label{fig:belts}
+\end{figure}
+
+\subsection{The monsoon}
+In the Arabian Sea (7.5 to 17.5 degrees north, 55 to 70 degrees east) the January mean wind is from the {{monsoon.arabian_jan.from_pt|raw}} at {{monsoon.arabian_jan.vec|f1}} m/s and the July mean wind from the {{monsoon.arabian_jul.from_pt|raw}} at {{monsoon.arabian_jul.vec|f1}} m/s (Figure \ref{fig:monsoon}). Off Somalia the July wind averages {{monsoon.somali_jul.vec|f1}} m/s, the low-level Somali jet. The Bay of Bengal reverses in the same way, from the {{monsoon.bengal_jan.from_pt|raw}} in January to the {{monsoon.bengal_jul.from_pt|raw}} in July. By the definition above, {{monsoon.reversal_share|pct}} of the area between 60 degrees north and south reverses its wind between January and July ({{monsoon.reversal_cells|int}} cells).
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=\textwidth]{fig_monsoon.png}
+\caption{The Indian Ocean in January and July: mean wind speed (land WorldClim; sea NCEP, faded) and mean near-surface flow.}\label{fig:monsoon}
+\end{figure}
+
+\subsection{Wind over land and the windiest places}
+The mean wind over land outside Antarctica is {{land.mean|f2}} m/s (median {{land.median|f2}}); including Antarctica it is {{land.mean_incl_ant|f2}}. Only {{land.share_ge5|pct1}} of land outside Antarctica averages 5 m/s or more and {{land.share_ge6|pct1}} 6 m/s or more, while {{land.share_lt2|pct}} averages under 2 m/s. Table \ref{tab:places} and Figure \ref{fig:windiest} list the 20 windiest distinct places. The first is the Vatnajökull ice cap in Iceland ({{windiest_places.0.wind|f1}} m/s), followed by Jan Mayen, the East Greenland ice sheet and the Southern Patagonian Ice Field; the rest are ice fields, high Andes and sub-Antarctic islands, with St Kilda the only point in the British Isles. Antarctica reaches {{antarctica.max|f1}} m/s. These are also the places with the sparsest station networks, where the interpolated values are least certain. Among countries and territories of at least 50,000 km\textsuperscript{2}, Iceland is windiest ({{ctry.ISL.wind|f1}} m/s) and the Republic of the Congo calmest ({{ctry_calmest.0.wind|f1}} m/s).
+
+{{TABLE_PLACES}}
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.86\textwidth]{fig_windiest.png}
+\caption{The 20 windiest distinct places on land outside Antarctica, by annual mean wind at 10 m (WorldClim, 1970 to 2000).}\label{fig:windiest}
+\end{figure}
+
+Of the {{cities_n|int}} Natural Earth cities with a million people or more, the windiest are Marseille ({{cities_windiest.0.wind|f1}} m/s), The Hague ({{cities_windiest.1.wind|f1}}), Melbourne, Auckland and Adelaide; the calmest Bogotá ({{cities_calmest.0.wind|f1}}), Cali, Srinagar, Medellín and Mandalay.
+
+\subsection{Seasonality}
+Averaged over northern land, the windiest month is {{land.nh_windiest_month|raw}} and the calmest {{land.nh_calmest_month|raw}}; over southern land outside Antarctica, {{land.sh_windiest_month|raw}} and {{land.sh_calmest_month|raw}} (Figure \ref{fig:seasons}). Spring is the windy season: {{derived.nh_spring_share|pct}} of northern land beyond the tropics has its windiest month in March, April or May, and {{seas.nh_windiest_month_share.3|pct}} in April alone, against {{seas.nh_winter_share|pct}} in December to March. The median ratio of the windiest to the calmest month is {{seas.median|f2}}; {{seas.share_ge2|pct}} of the land considered has a ratio of 2 or more and {{seas.share_lt13|pct}} a ratio under 1.3. The highest ratios are in two kinds of place: the interior of north-eastern Siberia, Mongolia and the Yukon, where winter air is calm under the Siberian and North American highs (the Kolyma uplands of Yakutia reach {{seasonal_places.0.ratio|f1}}), and the monsoon coasts and islands of the Indian Ocean (Kutch, Odisha, the Maldives and the Chagos Archipelago). Sistan, on the border of Afghanistan and Iran, peaks in July with its ``wind of 120 days''.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=\textwidth]{fig_seasons.png}
+\caption{Left: ratio of the windiest to the calmest monthly mean wind (land with an annual mean of at least 1.5 m/s; grey: below). Right: area-weighted monthly mean wind over northern land, southern land (outside Antarctica) and the UK.}\label{fig:seasons}
+\end{figure}
+
+\subsection{Wind farms}
+Of the {{farms.cap_gw|int}} GW listed, {{farms.cap_land_gw|f1}} GW is on land cells, {{farms.cap_coast_gw|f1}} GW on the coast and {{farms.cap_sea_gw|f1}} GW at sea. Capacity-weighted, the average onshore farm stands at the {{farms.land_cw_pctile|pct}} point of its country's distribution of land wind: {{farms.share_cap_above_median|pct}} of onshore capacity is above the national median and {{farms.share_cap_top_quarter|pct}} in the windiest quarter of the land. The capacity-weighted mean wind at onshore farms is {{farms.land_cw_wind|f2}} m/s, {{derived.farm_land_ratio|f2}} times the world land mean, though this comparison mixes countries. Among farms with a commissioning year, those from 2010 onwards stand at the {{farms.pctile_2010on|pct}} point and earlier ones at the {{farms.pctile_pre2010|pct}} point.
+
+Table \ref{tab:farms} and Figure \ref{fig:farms} give the {{farm_countries_n|int}} countries with substantial listed onshore capacity. In {{farm_countries_windier|int}} the farms are windier on average than the land. The largest differences are in countries where good wind resources are concentrated: Mexico, whose listed farms are almost all in the Isthmus of Tehuantepec in Oaxaca ({{fc.MEX.farm_cw_pctile|pct}}), Brazil, mostly along the north-east coast ({{fc.BRA.farm_cw_wind|f2}} m/s against {{fc.BRA.land_mean|f2}}), and Australia and Norway. The United States ({{fc.USA.farm_cw_wind|f2}} against {{fc.USA.land_mean|f2}}) and China ({{fc.CHN.farm_cw_wind|f2}} against {{fc.CHN.land_mean|f2}}) follow, with farms concentrated on the Great Plains and in Inner Mongolia and Gansu. Chile is the clearest exception ({{fc.CHL.farm_cw_pctile|pct}}): its farms are in the north and centre, near demand and the grid, while its windiest land is in Patagonia. In the UK the farms are only modestly windier than the land ({{fc.GBR.farm_cw_wind|f2}} against {{fc.GBR.land_mean|f2}} m/s), as its windiest ground is islands and uplands.
+
+{{TABLE_FARMS}}
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.9\textwidth]{fig_farms.png}
+\caption{Mean wind at 10 m over each country's land (grey) and the capacity-weighted mean at its listed onshore wind farms (coral), with the share of the country's land less windy than the average farm.}\label{fig:farms}
+\end{figure}
+
+\subsection{The United Kingdom and Ireland}
+The UK's land averages {{uk.mean|f2}} m/s at 10 m (Scotland {{uk.Scotland|f2}}, England {{uk.England|f2}}, Wales {{uk.Wales|f2}}, Northern Ireland {{uk.Northern Ireland|f2}}); Ireland averages {{ireland.mean|f2}}. Among countries and territories of at least 50,000 km\textsuperscript{2}, only Iceland, Greenland and Western Sahara are windier than the UK. {{uk.share_ge5|pct}} of UK land averages 5 m/s or more. The windiest counties are Shetland ({{uk_county.Shetland Islands.wind|f2}}), Na h-Eileanan Siar, Orkney, Argyll and Bute and North Ayrshire; in England, Cornwall ({{uk_county.Cornwall.wind|f2}}), Cumbria and the East Riding of Yorkshire; the calmest are Herefordshire ({{uk_county.Herefordshire.wind|f2}}), Shropshire and Worcestershire. The windiest cell is St Kilda ({{uk.max.wind|f1}} m/s). The UK's wind peaks in {{uk.windiest_month|raw}} ({{uk.months.0|f2}} m/s) and is lowest in {{uk.calmest_month|raw}} ({{uk.months.7|f2}}), a ratio of {{uk.ratio|f2}}. The database lists {{uk_farms.n|int}} UK wind farms with {{uk_farms.cap_gw|f1}} GW, of which {{uk_farms.cap_sea_gw|f1}} GW ({{derived.sea_share_uk|pct}}) is at sea; Scotland holds {{uk_farms.scot_share_land|pct}} of the onshore capacity (Figure \ref{fig:uk}).
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.72\textwidth]{fig_uk.png}
+\caption{Annual mean wind at 10 m over the UK and Ireland (WorldClim, 1970 to 2000) with wind farms from the WRI Global Power Plant Database (2021): on land (coral) and at sea (navy), sized by capacity.}\label{fig:uk}
+\end{figure}
+
+\section{Discussion and limitations}
+The two climatologies differ in height, resolution and period. Over {{check.n|int}} cells of solid land the reanalysis wind speed is a median {{check.ratio_median|f2}} times the WorldClim value, while the two agree on where it is windy (correlation {{check.r|f2}}); I therefore use the reanalysis only for direction and the oceans, and draw it faded. WorldClim's 10 m wind is not the wind at a turbine hub, 80 to 150 m up, and a 9 km cell averages over the ridges and hilltops where farms are built, so the farm comparisons are conservative and say nothing about energy yield, which depends on the distribution of wind speeds rather than the mean. The interpolation is weakest where stations are few: ice caps, mountains, deserts and remote islands, which dominate the list of windiest places. The power plant database is a 2021 snapshot, incomplete for several large markets, and its points can be approximate. Siting reflects much more than wind: grid access, land, planning and demand, as Chile and the UK show.
+
+\section{Conclusion}
+Two open climatologies are enough to draw the classic belts of the world's winds and the seasonal reversal of the monsoon, and to show that, with few exceptions, the world's listed wind farms stand on the windier ground of their countries: {{farms.share_cap_above_median|pct}} of onshore capacity is above the national median.
+
+\section*{Data and code availability}
+Code, derived data and the interactive page: \url{https://github.com/Tristan-Hotham/wind-map} and \url{https://maps.tristanhotham.com/wind-map/}. Archived release with this paper: {{DOILINK}}. Derived data and text are CC BY 4.0, except that summaries derived from WorldClim are for non-commercial use under the WorldClim terms; code is MIT.
+
+\section*{AI statement}
+I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.
+
+\section*{References}
+\small
+\begin{description}\setlength{\itemsep}{2pt}
+\item Fick, S.E. and Hijmans, R.J. (2017) WorldClim 2: new 1 km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37(12): 4302 to 4315. \url{https://doi.org/10.1002/joc.5086}
+\item Global Energy Observatory, Google, KTH Royal Institute of Technology in Stockholm, Enipedia, World Resources Institute (2021) Global Power Plant Database v1.3.0. \url{https://datasets.wri.org/dataset/globalpowerplantdatabase} (CC BY 4.0).
+\item Kalnay, E., Kanamitsu, M., Kistler, R. et al. (1996) The NCEP/NCAR 40-year reanalysis project. Bulletin of the American Meteorological Society 77(3): 437 to 471.
+\item NOAA Physical Sciences Laboratory. NCEP/NCAR Reanalysis 1, long-term monthly means at sigma 0.995. \url{https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.derived.html}
+\item Natural Earth. Free vector and raster map data. \url{https://www.naturalearthdata.com}
+\end{description}
+\end{document}
