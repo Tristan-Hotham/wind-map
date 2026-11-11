@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this data or code, please cite it as below."
+title: "Where the Wind Blows: The World's Winds Month by Month, Its Windiest Places, and Whether Wind Farms Stand in Them"
+type: dataset
+authors:
+  - family-names: Hotham
+    given-names: Tristan
+    orcid: "https://orcid.org/0000-0003-4931-9349"
+    affiliation: "Independent researcher"
+doi: "10.5281/zenodo.23844511"
+url: "https://maps.tristanhotham.com/wind-map/"
+repository-code: "https://github.com/Tristan-Hotham/wind-map"
+license: CC-BY-4.0
+keywords:
+  - "wind"
+  - "wind speed"
+  - "atmospheric circulation"
+  - "trade winds"
+  - "Roaring Forties"
+  - "monsoon"
+  - "seasonality"
+  - "wind farms"
+  - "WorldClim"
+  - "NCEP/NCAR reanalysis"
+  - "Global Power Plant Database"
+  - "United Kingdom"
+  - "data visualisation"
